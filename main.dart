@@ -4,6 +4,8 @@ void main() {
   runApp(ShoppingCart());
 }
 
+final List<ShoppingList> _listItems = [];
+
 class ShoppingCart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -45,8 +47,8 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   final _textColor = Color.fromRGBO(255, 103, 94, 1);
   final _textController = TextEditingController();
-  final List<ShoppingList> _listItems = [];
   final FocusNode _focusNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,7 +74,7 @@ class _CartScreenState extends State<CartScreen> {
                 itemBuilder: (_, int index) => _listItems[index],
                 itemCount: _listItems.length,
               ),
-            ), 
+            ),
           ),
           Container(
             margin: EdgeInsets.symmetric(vertical: 6.0),
@@ -104,14 +106,16 @@ class _CartScreenState extends State<CartScreen> {
             ),
           ),
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 4.0),
-            child: IconButton(
-              icon: const Icon(
-                Icons.add_outlined,
-                color: Colors.white,
-                size: 30.0,
+            margin: EdgeInsets.symmetric(horizontal: 5.0),
+            child: Center(
+              child: IconButton(
+                icon: const Icon(
+                  Icons.add_outlined,
+                  color: Colors.white,
+                  size: 30.0,
+                ),
+                onPressed: () => _handleSubmitted(_textController.text),
               ),
-              onPressed: () => _handleSubmitted(_textController.text),
             ),
           )
         ],
