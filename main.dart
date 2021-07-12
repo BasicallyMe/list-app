@@ -4,8 +4,6 @@ void main() {
   runApp(ShoppingCart());
 }
 
-final List<ShoppingList> _listItems = [];
-
 class ShoppingCart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -17,24 +15,26 @@ class ShoppingCart extends StatelessWidget {
 }
 
 class ShoppingList extends StatelessWidget {
-  ShoppingList({required this.text});
+  ShoppingList({required this.text, required this.animationController});
   final String text;
+  final AnimationController animationController;
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        title: Text(
-          text,
-          style: TextStyle(color: Colors.white, fontSize: 20.0),
+    return SizeTransition(
+      sizeFactor:
+          CurvedAnimation(parent: animationController, curve: Curves.bounceOut),
+      axisAlignment: 0.0,
+      child: Card(
+        child: ListTile(
+          title: Text(
+            text,
+            style: TextStyle(color: Colors.white, fontSize: 20.0),
+          ),
         ),
-        trailing: Icon(
-          Icons.remove_outlined,
-          color: Colors.white,
-        ),
+        color: Color.fromRGBO(255, 255, 255, 0.3),
+        elevation: 0,
+        margin: EdgeInsets.only(bottom: 6.0),
       ),
-      color: Color.fromRGBO(255, 255, 255, 0.3),
-      elevation: 0,
-      margin: EdgeInsets.only(bottom: 6.0),
     );
   }
 }
@@ -44,11 +44,14 @@ class CartScreen extends StatefulWidget {
   _CartScreenState createState() => _CartScreenState();
 }
 
-class _CartScreenState extends State<CartScreen> {
+class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
+  //Variable used in the class
   final _textColor = Color.fromRGBO(255, 103, 94, 1);
   final _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-
+  final List<ShoppingList> _listItems = [];
+  bool _isComposing = false;
+//Build method to create the basic visual layout of the app
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,7 +87,7 @@ class _CartScreenState extends State<CartScreen> {
       ),
     );
   }
-
+  //build the textfield 
   Widget _buildTextComposer() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10.0),
@@ -93,7 +96,12 @@ class _CartScreenState extends State<CartScreen> {
           Flexible(
             child: TextField(
               controller: _textController,
-              onSubmitted: _handleSubmitted,
+              onChanged: (String text) {
+                setState(() {
+                  _isComposing = text.isNotEmpty;
+                });
+              },
+              onSubmitted: _isComposing ? _handleSubmitted : null,
               decoration: InputDecoration(
                 hintText: 'Type an item',
                 fillColor: Colors.white,
@@ -114,7 +122,7 @@ class _CartScreenState extends State<CartScreen> {
                   color: Colors.white,
                   size: 30.0,
                 ),
-                onPressed: () => _handleSubmitted(_textController.text),
+                onPressed: _isComposing ? () => _handleSubmitted(_textController.text) : null,
               ),
             ),
           )
@@ -125,12 +133,28 @@ class _CartScreenState extends State<CartScreen> {
 
   void _handleSubmitted(String text) {
     _textController.clear();
+    setState(() {
+      _isComposing = false;
+    });
     ShoppingList listItem = ShoppingList(
       text: text,
+      animationController: AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 200),
+      ),
     );
     setState(() {
       _listItems.insert(0, listItem);
     });
     _focusNode.requestFocus();
+    listItem.animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    for (var listItem in _listItems) {
+      listItem.animationController.dispose();
+    }
+    super.dispose();
   }
 }
