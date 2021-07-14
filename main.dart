@@ -22,12 +22,13 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   final List<String> _itemList = <String>[];
   final _textController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Cart'),
+        title: Center(child: const Text('To-do List')),
       ),
       body: ListView(children: _getItems()),
       floatingActionButton: FloatingActionButton(
@@ -43,11 +44,27 @@ class _CartScreenState extends State<CartScreen> {
       _itemList.add(title);
     });
     _textController.clear();
+    _focusNode.requestFocus();
+  }
+
+  void _deleteItem(String title) {
+    setState(() {
+      _itemList.remove(title);
+    });
   }
 
   Widget _buildItem(String title) {
-    return ListTile(
-      title: Text(title),
+    return Card(
+      child: ListTile(
+        title: Text(title),
+        trailing: IconButton(
+          onPressed: () async => _deleteItem(title),
+          icon: Icon(
+            Icons.delete_outlined,
+          ),
+        ),
+      ),
+      color: Colors.amber.shade200,
     );
   }
 
@@ -68,6 +85,7 @@ class _CartScreenState extends State<CartScreen> {
                 Navigator.of(context).pop();
                 _addItem(_textController.text);
               },
+              focusNode: _focusNode,
             ),
             TextButton(
               child: const Text('CANCEL'),
@@ -80,6 +98,7 @@ class _CartScreenState extends State<CartScreen> {
       },
     );
   }
+
   List<Widget> _getItems() {
     final List<Widget> _itemWidgets = <Widget>[];
     for (String title in _itemList) {
