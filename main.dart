@@ -9,6 +9,22 @@ class ShoppingCart extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Shopping Cart',
+      theme: ThemeData(
+        appBarTheme: AppBarTheme(
+          textTheme: TextTheme(
+            headline6: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.w100,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        primaryColor: Colors.amber.shade400,
+        accentColor: Colors.white,
+        dialogTheme: DialogTheme(
+          backgroundColor: Colors.white,
+        ),
+      ),
       home: CartScreen(),
     );
   }
@@ -34,7 +50,12 @@ class _CartScreenState extends State<CartScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _displayDialog(context),
         tooltip: 'Add Item',
-        child: Icon(Icons.add),
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Theme.of(context).accentColor,
+        child: Icon(
+          Icons.add,
+          size: 20.0,
+        ),
       ),
     );
   }
@@ -51,6 +72,13 @@ class _CartScreenState extends State<CartScreen> {
     setState(() {
       _itemList.remove(title);
     });
+  }
+
+  @override 
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+
   }
 
   Widget _buildItem(String title) {
@@ -73,10 +101,11 @@ class _CartScreenState extends State<CartScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add your item to the list'),
+          title: const Text("What's on your mind?"),
           content: TextField(
             controller: _textController,
-            decoration: const InputDecoration(hintText: 'Enter item here'),
+            decoration:
+                const InputDecoration(hintText: "Enter your task here"),
           ),
           actions: <Widget>[
             TextButton(
